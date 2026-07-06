@@ -1,4 +1,5 @@
-:root {
+:root,
+html[data-theme='dark'] {
   --bg: #0f1115;
   --panel: #171a21;
   --panel2: #1e222b;
@@ -12,6 +13,29 @@
   --must: #d4534f;
   --think: #4a90ff;
   --impl: #f0913c;
+  --stars-bg-color: #3a4150;
+  --diff-cf-color: #7fd1b9;
+  --chip-on-text: #06101f;
+}
+
+/* 浅色（白天）模式：由 JS 在 <html data-theme> 上切换，覆盖同名变量 */
+html[data-theme='light'] {
+  --bg: #f4f5f7;
+  --panel: #ffffff;
+  --panel2: #eceff3;
+  --border: #d7dbe3;
+  --text: #1a1d24;
+  --muted: #5b6472;
+  --accent: #2f6fed;
+  --gold: #9a7300;
+  --topic: #2b6cb0;
+  --reason: #7048a8;
+  --must: #c23b3b;
+  --think: #2f6fed;
+  --impl: #c96a12;
+  --stars-bg-color: #d7dbe3;
+  --diff-cf-color: #1a8f6c;
+  --chip-on-text: #ffffff;
 }
 
 * { box-sizing: border-box; }
@@ -21,6 +45,7 @@ body {
   color: var(--text);
   font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
   line-height: 1.6;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -28,6 +53,16 @@ a:hover { text-decoration: underline; }
 .center { padding: 4rem; text-align: center; color: var(--muted); }
 
 .wrap { max-width: 1080px; margin: 0 auto; padding: 1.5rem; }
+
+/* 顶部控制条：主题标签显隐 + 深浅色切换，列表页与详情页共用 */
+.top-controls { display: flex; justify-content: flex-end; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+.topic-toggle { font-size: 0.85rem; }
+.theme-btn { background: var(--panel); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 0.35rem 0.7rem; cursor: pointer; font-size: 0.85rem; white-space: nowrap; }
+.theme-btn:hover { border-color: var(--accent); }
+
+/* 主题/topic 标签防剧透：默认隐藏时的占位提示 */
+.tag-hidden { background: var(--panel2); border: 1px dashed var(--border); color: var(--muted); border-radius: 6px; padding: 0.1rem 0.45rem; font-size: 0.78rem; }
+.facets-hidden-hint { font-size: 0.82rem; }
 
 .site-header h1 { margin: 0 0 0.2rem; font-size: 1.6rem; }
 .site-header .sub { margin: 0; color: var(--muted); font-size: 0.9rem; }
@@ -41,7 +76,7 @@ a:hover { text-decoration: underline; }
 .facet-label { color: var(--muted); font-size: 0.85rem; margin-right: 0.3rem; }
 .chip { border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 999px; padding: 0.2rem 0.6rem; font-size: 0.82rem; cursor: pointer; }
 .chip:hover { border-color: var(--accent); }
-.chip-on { background: var(--accent); color: #06101f; border-color: var(--accent); }
+.chip-on { background: var(--accent); color: var(--chip-on-text); border-color: var(--accent); }
 .chip-n { opacity: 0.6; font-size: 0.78em; }
 
 .count-line { color: var(--muted); font-size: 0.85rem; margin: 0.6rem 0; }
@@ -70,13 +105,13 @@ a:hover { text-decoration: underline; }
 .tag-reason { background: color-mix(in srgb, var(--reason) 35%, transparent); }
 
 .diff { border-radius: 6px; padding: 0.1rem 0.45rem; font-size: 0.8rem; border: 1px solid var(--border); }
-.diff-cf { color: #7fd1b9; }
+.diff-cf { color: var(--diff-cf-color); }
 .diff-medal { color: var(--gold); }
 
 .badge-must { background: var(--must); color: #fff; border-radius: 6px; padding: 0.05rem 0.4rem; font-size: 0.75rem; }
 
 .stars { position: relative; display: inline-block; font-size: 0.95rem; line-height: 1; white-space: nowrap; }
-.stars-bg { color: #3a4150; }
+.stars-bg { color: var(--stars-bg-color); }
 .stars-fg { color: var(--gold); position: absolute; left: 0; top: 0; overflow: hidden; }
 
 .thinkbar { display: inline-flex; width: 90px; height: 8px; border-radius: 4px; overflow: hidden; vertical-align: middle; border: 1px solid var(--border); }

@@ -14,10 +14,60 @@ function useHashRoute(): string {
   return hash;
 }
 
+type Theme = 'dark' | 'light';
+
+// 主题偏好持久化到 localStorage；默认深色（与现状一致），应用到 <html data-theme> 供 CSS 变量切换。
+function useTheme(): [Theme, (t: Theme) => void] {
+  const [theme, setTheme] = useState<Theme>(() => {
+    const saved = localStorage.getItem('theme');
+    return saved === 'light' ? 'light' : 'dark';
+  });
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+  return [theme, setTheme];
+}
+
+// 主题/topic 标签默认隐藏，防止想刷题的人被剧透做法；用户可主动切换显示，偏好持久化。
+function useShowTopics(): [boolean, (v: boolean) => void] {
+  const [show, setShow] = useState<boolean>(() => localStorage.getItem('showTopics') === '1');
+  useEffect(() => {
+    localStorage.setItem('showTopics', show ? '1' : '0');
+  }, [show]);
+  return [show, setShow];
+}
+
+function TopControls({
+  theme,
+  onToggleTheme,
+  showTopics,
+  onToggleTopics,
+}: {
+  theme: Theme;
+  onToggleTheme: () => void;
+  showTopics: boolean;
+  onToggleTopics: (v: boolean) => void;
+}) {
+  return (
+    <div className="top-controls">
+      <label className="check topic-toggle" title="主题/算法标签可能剧透做法，默认隐藏">
+        <input type="checkbox" checked={showTopics} onChange={(e) => onToggleTopics(e.target.checked)} />
+        显示主题标签（剧透警告）
+      </label>
+      <button className="theme-btn" onClick={onToggleTheme} title="切换深色/浅色模式">
+        {theme === 'dark' ? '☀️ 浅色模式' : '🌙 深色模式'}
+      </button>
+    </div>
+  );
+}
+
 export default function App() {
   const [data, setData] = useState<Dataset | null>(null);
   const [error, setError] = useState<string | null>(null);
   const route = useHashRoute();
+  const [theme, setTheme] = useTheme();
+  const [showTopics, setShowTopics] = useShowTopics();
 
   useEffect(() => {
     // 加 ?v=<构建版本> 击穿浏览器与 GitHub Pages CDN 缓存：data.json 文件名固定、
@@ -31,6 +81,11 @@ export default function App() {
       .catch((e) => setError(String(e)));
   }, []);
 
+  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
+  const controls = (
+    <TopControls theme={theme} onToggleTheme={toggleTheme} showTopics={showTopics} onToggleTopics={setShowTopics} />
+  );
+
   if (error) return <div className="center">{error}</div>;
   if (!data) return <div className="center">加载中…</div>;
 
@@ -38,14 +93,24 @@ export default function App() {
   const m = route.match(/^#\/p\/(.+)$/);
   if (m) {
     const problem = data.problems.find((p) => p.id === decodeURIComponent(m[1]));
-    if (problem) return <Detail problem={problem} data={data} people={people} />;
+    if (problem) return <Detail problem={problem} data={data} people={people} showTopics={showTopics} controls={controls} />;
   }
-  return <List data={data} people={people} />;
+  return <List data={data} people={people} showTopics={showTopics} controls={controls} />;
 }
 
 type SortKey = 'rating' | 'difficulty' | 'recommenders' | 'title';
 
-function List({ data, people }: { data: Dataset; people: ReturnType<typeof buildPeopleMap> }) {
+function List({
+  data,
+  people,
+  showTopics,
+  controls,
+}: {
+  data: Dataset;
+  people: ReturnType<typeof buildPeopleMap>;
+  showTopics: boolean;
+  controls: ReactNode;
+}) {
   const [query, setQuery] = useState('');
   const [topics, setTopics] = useState<Set<string>>(new Set());
   const [reasons, setReasons] = useState<Set<string>>(new Set());
@@ -54,6 +119,11 @@ function List({ data, people }: { data: Dataset; people: ReturnType<typeof build
 
   const topicCounts = useTagCounts(data.problems, 'topic');
   const reasonCounts = useTagCounts(data.problems, 'reason');
+
+  // 主题标签被隐藏时，清空已选的主题筛选，避免"看不见但仍在生效"的隐藏过滤条件。
+  useEffect(() => {
+    if (!showTopics && topics.size > 0) setTopics(new Set());
+  }, [showTopics]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggle = (set: Set<string>, setter: (s: Set<string>) => void, v: string) => {
     const next = new Set(set);
@@ -87,6 +157,7 @@ function List({ data, people }: { data: Dataset; people: ReturnType<typeof build
 
   return (
     <div className="wrap">
+      {controls}
       <header className="site-header">
         <h1>DLUT CPC 精选题单</h1>
         <p className="sub">
@@ -114,14 +185,22 @@ function List({ data, people }: { data: Dataset; people: ReturnType<typeof build
         </select>
       </div>
 
-      <FacetRow label="主题" counts={topicCounts} selected={topics} onToggle={(v) => toggle(topics, setTopics, v)} />
+      {showTopics ? (
+        <FacetRow label="主题" counts={topicCounts} selected={topics} onToggle={(v) => toggle(topics, setTopics, v)} />
+      ) : (
+        topicCounts.size > 0 && (
+          <div className="facets facets-hidden-hint">
+            <span className="muted">🔒 主题标签已隐藏（防剧透），勾选上方“显示主题标签”可查看并按主题筛选</span>
+          </div>
+        )
+      )}
       <FacetRow label="理由" counts={reasonCounts} selected={reasons} onToggle={(v) => toggle(reasons, setReasons, v)} />
 
       <div className="count-line">显示 {filtered.length} / {data.problems.length} 题</div>
 
       <div className="rows">
         {filtered.map((p) => (
-          <ProblemRow key={p.id} p={p} data={data} people={people} />
+          <ProblemRow key={p.id} p={p} data={data} people={people} showTopics={showTopics} />
         ))}
         {filtered.length === 0 && <div className="muted">没有匹配的题目。</div>}
       </div>
@@ -174,8 +253,19 @@ function RatingNum({ value }: { value: number | null }) {
   );
 }
 
-function ProblemRow({ p, data, people }: { p: Problem; data: Dataset; people: ReturnType<typeof buildPeopleMap> }) {
+function ProblemRow({
+  p,
+  data,
+  people,
+  showTopics,
+}: {
+  p: Problem;
+  data: Dataset;
+  people: ReturnType<typeof buildPeopleMap>;
+  showTopics: boolean;
+}) {
   const firstComment = p.recommenders.find((r) => r.comment)?.comment;
+  const topicTags = p.tags.topic ?? [];
   return (
     <a className="row" href={`#/p/${encodeURIComponent(p.id)}`}>
       <div className="row-rating">
@@ -188,7 +278,11 @@ function ProblemRow({ p, data, people }: { p: Problem; data: Dataset; people: Re
           <span className="row-title">{p.title}</span>
           {(p.must_do?.length ?? 0) > 0 && <span className="badge-must">必做</span>}
           <span className="row-tags">
-            {(p.tags.topic ?? []).map((t) => <span key={t} className="tag tag-topic">{t}</span>)}
+            {showTopics
+              ? topicTags.map((t) => <span key={t} className="tag tag-topic">{t}</span>)
+              : topicTags.length > 0 && (
+                  <span className="tag tag-hidden" title="主题标签已隐藏，防止剧透">🔒 主题×{topicTags.length}</span>
+                )}
             {(p.tags.reason ?? []).map((t) => <span key={`r-${t}`} className="tag tag-reason">{t}</span>)}
           </span>
         </div>
@@ -266,13 +360,27 @@ function Tabs({
   );
 }
 
-function Detail({ problem: p, data, people }: { problem: Problem; data: Dataset; people: ReturnType<typeof buildPeopleMap> }) {
+function Detail({
+  problem: p,
+  data,
+  people,
+  showTopics,
+  controls,
+}: {
+  problem: Problem;
+  data: Dataset;
+  people: ReturnType<typeof buildPeopleMap>;
+  showTopics: boolean;
+  controls: ReactNode;
+}) {
   const statements = p.statements ?? [];
   const solutions = p.solutions ?? [];
   const kindLabel: Record<string, string> = { original: '原文', translation: '翻译', simplified: '简化' };
+  const topicTags = p.tags.topic ?? [];
 
   return (
     <div className="wrap detail">
+      {controls}
       <a className="back" href="#/">← 返回列表</a>
       <h1 className="detail-title">
         {p.title} <span className="detail-id">{p.id}</span>
@@ -342,7 +450,13 @@ function Detail({ problem: p, data, people }: { problem: Problem; data: Dataset;
       <section>
         <h2>标签</h2>
         <div className="card-tags">
-          {(p.tags.topic ?? []).map((t) => <span key={t} className="tag tag-topic">{t}</span>)}
+          {showTopics
+            ? topicTags.map((t) => <span key={t} className="tag tag-topic">{t}</span>)
+            : topicTags.length > 0 && (
+                <span className="tag tag-hidden" title="主题标签已隐藏，防止剧透">
+                  🔒 主题标签已隐藏（{topicTags.length} 个）
+                </span>
+              )}
           {(p.tags.reason ?? []).map((t) => <span key={t} className="tag tag-reason">{t}</span>)}
         </div>
         {(p.must_do?.length ?? 0) > 0 && (
