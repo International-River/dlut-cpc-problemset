@@ -1,0 +1,71 @@
+id: CF1458C
+slug: CF1458C
+title: "Latin Square"
+
+source:
+  contest: "Codeforces Round 691 (Div. 1)"
+  origin_platform: Codeforces
+
+links:
+  - platform: Codeforces
+    url: "https://codeforces.com/contest/1458/problem/C"
+    is_primary: true
+  - platform: Luogu
+    url: "https://www.luogu.com.cn/problem/CF1458C"
+
+recommenders:
+  - handle: InterRiver
+    comment: "维护拉丁方阵上的六种变换操作，想要高效处理变换需要洞察线性本质。"
+    date: 2026-07-06
+    strength: 5
+
+tags:
+  topic: [线性代数]
+  reason: [教育意义, 模型转化, 观赏性强]
+
+thinking_ratio:
+  - evaluator: InterRiver
+    value: 7
+    date: 2026-07-06
+
+difficulty:
+  - evaluator: InterRiver
+    scale: medal
+    value: silver_upper
+    date: 2026-07-06
+  - evaluator: Codeforces
+    scale: cf
+    value: 2700
+
+statements:
+  - file: statements/original.en.md
+    kind: original
+    lang: en
+    source_url: "https://codeforces.com/contest/1458/problem/C"
+    license: "仅存档备份"
+    redistribute: true
+  - file: statements/translation.zh.md
+    kind: translation
+    lang: zh
+    source_url: "https://www.luogu.com.cn/problem/CF1458C"
+    license: "洛谷官方翻译，仅存档备份"
+    redistribute: true
+
+solutions:
+  - file: solutions/InterRiver.md
+    author: InterRiver
+    kind: community
+    lang: zh
+    date: 2026-07-06
+    redistribute: true
+
+must_do: [InterRiver]
+
+status:
+  availability: ok
+  last_checked: 2026-07-06
+
+meta:
+  created: 2026-07-06
+  updated: 2026-07-06
+  added_by: InterRiver

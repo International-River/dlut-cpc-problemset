@@ -1,0 +1,19 @@
+{
+  "name": "recommend-problemset",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "DLUT精选题单 —— 数据仓库与构建管道",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs --check",
+    "gen:forms": "node scripts/gen-issue-forms.mjs",
+    "intake": "node scripts/intake.mjs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "js-yaml": "^5.2.1"
+  }
+}

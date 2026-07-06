@@ -1,0 +1,19 @@
+# 奖牌档 ↔ CF rating 近似映射
+#
+# 重要说明：本映射【仅用于跨标尺排序与聚合】（例如“按难度排序”、加权平均、分布图）。
+# 原生显示不受影响：CF 题仍显示分数，区域赛题仍显示“金牌·中位”。
+# 因此这里的数值只影响排序结果，不是精确难度，可随时微调。
+#
+# scale=cf 时 value 直接是 800-3500 的整数，无需映射。
+# scale=medal 时 value 取下列枚举，构建层用 rating 字段换算为统一排序键。
+
+medal:
+  gold_upper:    { rating: 3000, label: "金牌·上位" }
+  gold_mid:      { rating: 2800, label: "金牌·中位" }
+  gold_lower:    { rating: 2600, label: "金牌·下位" }
+  silver_upper:  { rating: 2400, label: "银牌·上位" }
+  silver_mid:    { rating: 2200, label: "银牌·中位" }
+  silver_lower:  { rating: 2000, label: "银牌·下位" }
+  bronze_upper:  { rating: 1800, label: "铜牌·上位" }
+  bronze_mid:    { rating: 1600, label: "铜牌·中位" }
+  bronze_lower:  { rating: 1400, label: "铜牌·下位" }

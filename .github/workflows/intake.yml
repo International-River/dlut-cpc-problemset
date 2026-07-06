@@ -1,0 +1,76 @@
+# M4 · 投稿转 PR
+# 核心成员给投稿 Issue 打上 `approved-intake` 标签后触发：
+# 解析表单 → 生成/补丁文件 → 自动开 PR 回链 Issue。
+name: 投稿转 PR
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  intake:
+    # 仅当被打上的正是 approved-intake 标签才跑
+    if: github.event.label.name == 'approved-intake'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 判定投稿类型
+        id: kind
+        env:
+          LABELS: ${{ toJSON(github.event.issue.labels.*.name) }}
+        run: |
+          if echo "$LABELS" | grep -q 'intake:problem'; then
+            echo "type=problem" >> "$GITHUB_OUTPUT"
+            echo "template=.github/ISSUE_TEMPLATE/recommend-problem.yml" >> "$GITHUB_OUTPUT"
+          elif echo "$LABELS" | grep -q 'intake:append'; then
+            echo "type=append" >> "$GITHUB_OUTPUT"
+            echo "template=.github/ISSUE_TEMPLATE/append-evaluation.yml" >> "$GITHUB_OUTPUT"
+          elif echo "$LABELS" | grep -q 'intake:tag'; then
+            echo "type=tag" >> "$GITHUB_OUTPUT"
+            echo "template=.github/ISSUE_TEMPLATE/propose-tag.yml" >> "$GITHUB_OUTPUT"
+          else
+            echo "非投稿 Issue（无 intake:* 标签），跳过。"
+            echo "type=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 解析 Issue 表单
+        if: steps.kind.outputs.type != ''
+        id: parse
+        uses: stefanbuck/github-issue-parser@v3
+        with:
+          template-path: ${{ steps.kind.outputs.template }}
+
+      - uses: actions/setup-node@v4
+        if: steps.kind.outputs.type != ''
+        with:
+          node-version: 20
+
+      - name: 安装依赖
+        if: steps.kind.outputs.type != ''
+        run: npm ci
+
+      - name: 生成 / 补丁文件
+        if: steps.kind.outputs.type != ''
+        id: gen
+        env:
+          INTAKE_TYPE: ${{ steps.kind.outputs.type }}
+          ISSUE_JSON: ${{ steps.parse.outputs.jsonString }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: node scripts/intake.mjs
+
+      - name: 开 Pull Request
+        if: steps.kind.outputs.type != ''
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: ${{ steps.gen.outputs.branch }}
+          title: ${{ steps.gen.outputs.title }}
+          body: ${{ steps.gen.outputs.body }}
+          commit-message: ${{ steps.gen.outputs.title }}
+          labels: intake
+          delete-branch: true

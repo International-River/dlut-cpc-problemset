@@ -1,0 +1,32 @@
+# M4/M8 · 数据校验
+# 任何改动题目/数据/规范/脚本的 PR 都跑一遍 M2 校验（schema + 交叉引用 + 配额）。
+# 红叉即代表投稿数据有问题，核心成员据此判断是否需要修改。
+name: 校验
+
+on:
+  pull_request:
+    paths:
+      - "problems/**"
+      - "data/**"
+      - "spec/**"
+      - "scripts/**"
+      - "package.json"
+  push:
+    branches: [main]
+    paths:
+      - "problems/**"
+      - "data/**"
+      - "spec/**"
+      - "scripts/**"
+      - "package.json"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run check

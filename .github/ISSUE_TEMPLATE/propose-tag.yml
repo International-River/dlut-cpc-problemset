@@ -1,0 +1,39 @@
+# 本文件由 scripts/gen-issue-forms.mjs 依据白名单快照自动生成，请勿手改。
+name: 提议新标签
+description: 标签受控，只有核心成员能改白名单。你可以在此提议新标签，核心成员合并生成的 PR 即代表批准。
+labels:
+  - intake
+  - intake:tag
+body:
+  - type: markdown
+    attributes:
+      value: 提议一个新的受控标签。合并生成的 PR 即代表核心成员批准并加入白名单。
+  - type: dropdown
+    id: dimension
+    attributes:
+      label: 标签维度（必填）
+      options:
+        - topic（主题：算法/题型）
+        - reason（推荐理由）
+    validations:
+      required: true
+  - type: input
+    id: tag_name
+    attributes:
+      label: 标签名（必填，如 莫队）
+    validations:
+      required: true
+  - type: input
+    id: handle
+    attributes:
+      label: 你的 handle（必填）
+    validations:
+      required: true
+  - type: input
+    id: aliases
+    attributes:
+      label: 别名（选填，逗号分隔，如 mo,莫队算法）
+  - type: textarea
+    id: reason_text
+    attributes:
+      label: 为什么需要这个标签（选填）

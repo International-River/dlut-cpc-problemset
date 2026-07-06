@@ -1,0 +1,90 @@
+# 本文件由 scripts/gen-issue-forms.mjs 依据白名单快照自动生成，请勿手改。
+name: 给已有题追加评价 / 题解
+description: 为题单里已有的题追加你的推荐 / 难度评分 / 思维比例 / 题解。填「题目 ID / 你的 handle」即可，其余按需填。
+labels:
+  - intake
+  - intake:append
+body:
+  - type: markdown
+    attributes:
+      value: 为**已有题目**追加内容。只需填题目 ID 与你的 handle，其余按你想追加的部分填即可（留空的不会追加）。
+  - type: input
+    id: problem_id
+    attributes:
+      label: 题目 ID（必填，如 CF1458C，即题目文件夹名）
+    validations:
+      required: true
+  - type: input
+    id: handle
+    attributes:
+      label: 你的 handle（必填；新人将自动登记为 guest）
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: —— 以下按需填，留空即不追加 ——
+  - type: textarea
+    id: comment
+    attributes:
+      label: 推荐语（选填，填了即追加一条推荐）
+  - type: dropdown
+    id: strength
+    attributes:
+      label: 推荐强度（选填，1 … 5）
+      options:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+  - type: dropdown
+    id: difficulty_scale
+    attributes:
+      label: 难度标尺（选填）
+      options:
+        - cf（Codeforces 分数）
+        - medal（奖牌档）
+  - type: input
+    id: cf_value
+    attributes:
+      label: CF 难度分（选填，800–3500）
+  - type: dropdown
+    id: medal_value
+    attributes:
+      label: 奖牌档（选填）
+      options:
+        - 金牌·上位 (gold_upper)
+        - 金牌·中位 (gold_mid)
+        - 金牌·下位 (gold_lower)
+        - 银牌·上位 (silver_upper)
+        - 银牌·中位 (silver_mid)
+        - 银牌·下位 (silver_lower)
+        - 铜牌·上位 (bronze_upper)
+        - 铜牌·中位 (bronze_mid)
+        - 铜牌·下位 (bronze_lower)
+  - type: dropdown
+    id: thinking_ratio
+    attributes:
+      label: 思维比例（选填，0 … 10）
+      options:
+        - '0'
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        - '6'
+        - '7'
+        - '8'
+        - '9'
+        - '10'
+  - type: textarea
+    id: solution
+    attributes:
+      label: 题解（选填，填了即追加一份，作者为你）
+  - type: checkboxes
+    id: must_do
+    attributes:
+      label: 必做徽章（选填）
+      options:
+        - label: 为这道题盖“必做”徽章（仅核心/受信任成员有效）

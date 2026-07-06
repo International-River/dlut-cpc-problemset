@@ -1,0 +1,29 @@
+# 人员名册
+# handle：必填、唯一、公开；name（真名）：选填、可空。
+# 网站显示：有真名显示 handle(真名)，无真名只显示 handle。
+# 各处（recommenders/difficulty.evaluator/thinking_ratio.evaluator/solutions.author/must_do/meta.added_by）均引用 handle。
+# role：core | trusted | guest | platform。weight 不在此手写，由 role 经 data/config.yml 的 role_weight 派生（core=3/trusted=2/guest=1）。
+# platform 为保留平台账号（如 Codeforces），只承载“官方难度”等平台事实，不参与推荐/热度/必做徽章，也无需 name。
+
+people:
+
+  - handle: InterRiver
+    role: core
+
+  - handle: Yzm007
+    role: core
+
+  - handle: EternalEpic
+    role: core
+
+  # 保留特殊账号：公用匿名马甲。供偶尔不愿公开身份者投稿使用，默认不鼓励开放。
+  # 不代表单一个人，按 guest 计权（weight=1），且不可盖“必做”徽章（见 config.yml permissions）。
+  - handle: Anonymous
+    role: guest
+    reserved: true
+
+  # 保留平台账号：代表平台官方难度评分（如 CF rating），可作为 difficulty 的 evaluator。
+  # 不是真人，不参与推荐/热度/必做徽章；仅用于承载“官方难度”这类平台事实。
+  - handle: Codeforces
+    role: platform
+    reserved: true

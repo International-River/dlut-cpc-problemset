@@ -1,0 +1,48 @@
+# 全局配置
+
+# —— 人员权重（由 role 派生，不在 people.yml 手写）——
+# weight 完全由 role 决定，避免 role 与 weight 打架。people.yml 只写 role。
+# 该权重同时用于：①推荐分（加权平均星级）②难度排序参考分（按评价人加权平均）。
+role_weight:
+  core: 3
+  trusted: 2
+  guest: 1
+  platform: 3              # 平台官方评分（如 CF rating）作为难度评价时的权重
+default_weight: 1          # role 缺失或未知时的兜底
+
+# —— 权限（按 role 限制）——
+permissions:
+  # 谁能盖“必做”徽章：仅核心/受信任成员；guest（含匿名马甲）不可。
+  can_grant_must_do: [core, trusted]
+  # 谁的普通推荐计入热度：全部（含 guest），guest 权重仅 1。
+  can_recommend: [core, trusted, guest]
+
+# —— 推荐度机制（A + B）——
+recommendation:
+  # B｜普通推荐：不限量。
+  # 加权平均推荐分（1-5 星量纲），由前端派生，不落盘：
+  #   rating = Σ( role_weight[r.role] × r.strength ) / Σ( role_weight[r.role] )
+  #   - weight   由推荐人的 role 经 role_weight 查表得出（“人”的品味可信度，全局）
+  #   - strength 来自 meta.yml recommenders[].strength，是“这条推荐”的星级（per 人-题，1-5）
+  # 用加权平均而非求和：避免“多人低星”盖过“单人高星”，也避免核心成员的 1 星被权重抬成 3 星。
+  # 说明：本分数衡量“综合推荐星级”，与“有多少人推荐”的热度是两回事，后者另由推荐人数展示。
+  weighted_rating:
+    formula: "sum(role_weight[r.role] * r.strength) / sum(role_weight[r.role])"
+    default_strength: 3      # recommenders[] 未填 strength 时的默认值
+
+  # A｜必做徽章：配额制，保证顶级信号稀缺。
+  must_do_quota:
+    # 每位成员的名额 = max(min_slots, ceil(题库总数 * ratio))
+    ratio: 0.2             # 占题库比例上限
+    min_slots: 3           # 题库很小时的保底名额
+    # 超过配额时，构建管道 M2 报错，需成员自行撤下旧的必做徽章。
+
+# —— 难度 ——
+difficulty:
+  cf_min: 800
+  cf_max: 3500
+
+# —— 死链检查（软校验，不阻断构建）——
+link_check:
+  enabled: true
+  schedule: monthly

@@ -1,0 +1,6 @@
+# 本文件由 scripts/gen-issue-forms.mjs 生成。
+blank_issues_enabled: false
+contact_links:
+  - name: 使用说明 / 讨论
+    url: https://github.com/
+    about: 不确定填什么？可先在 Discussions 里问。（部署后请把此链接换成真实仓库地址）

@@ -1,0 +1,172 @@
+# 本文件由 scripts/gen-issue-forms.mjs 依据白名单快照自动生成，请勿手改。
+name: 推荐一道题
+description: 推荐一道好题加入题单。只需填「链接 / 标题 / 你的 handle」，其余全部可选。
+labels:
+  - intake
+  - intake:problem
+body:
+  - type: markdown
+    attributes:
+      value: 感谢投稿！**只有前三项必填**，其余都可以留空，之后随时可补。
+  - type: textarea
+    id: links
+    attributes:
+      label: 题目链接（必填，每行一个，第一行视为主链接）
+      placeholder: |-
+        https://codeforces.com/contest/1458/problem/C
+        https://www.luogu.com.cn/problem/CF1458C
+    validations:
+      required: true
+  - type: input
+    id: title
+    attributes:
+      label: 题目名称（必填）
+    validations:
+      required: true
+  - type: input
+    id: handle
+    attributes:
+      label: 你的 handle（必填，用于署名；新人将自动登记为 guest）
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: —— 以下全部选填 ——
+  - type: input
+    id: slug
+    attributes:
+      label: 题号 / 短名（选填，如 CF1458C；留空将自动生成 id）
+  - type: input
+    id: contest
+    attributes:
+      label: 来源 / 比赛（选填，如 Codeforces Round 691 (Div. 1)）
+  - type: input
+    id: origin_platform
+    attributes:
+      label: 原始平台（选填，如 Codeforces）
+  - type: textarea
+    id: comment
+    attributes:
+      label: 推荐语（选填）
+  - type: dropdown
+    id: strength
+    attributes:
+      label: 推荐强度（选填，1 一般 … 5 强烈推荐）
+      options:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+  - type: dropdown
+    id: difficulty_scale
+    attributes:
+      label: 难度标尺（选填）
+      options:
+        - cf（Codeforces 分数）
+        - medal（奖牌档）
+  - type: input
+    id: cf_value
+    attributes:
+      label: CF 难度分（选填，标尺选 cf 时填，800–3500 整数）
+  - type: dropdown
+    id: medal_value
+    attributes:
+      label: 奖牌档（选填，标尺选 medal 时选）
+      options:
+        - 金牌·上位 (gold_upper)
+        - 金牌·中位 (gold_mid)
+        - 金牌·下位 (gold_lower)
+        - 银牌·上位 (silver_upper)
+        - 银牌·中位 (silver_mid)
+        - 银牌·下位 (silver_lower)
+        - 铜牌·上位 (bronze_upper)
+        - 铜牌·中位 (bronze_mid)
+        - 铜牌·下位 (bronze_lower)
+  - type: dropdown
+    id: thinking_ratio
+    attributes:
+      label: 思维比例（选填，0=纯实现 … 10=纯思维）
+      options:
+        - '0'
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        - '6'
+        - '7'
+        - '8'
+        - '9'
+        - '10'
+  - type: checkboxes
+    id: topic
+    attributes:
+      label: 主题标签（选填，可多选）
+      options:
+        - label: DP
+        - label: 数据结构
+        - label: 线段树
+        - label: 树状数组
+        - label: 图论
+        - label: 最短路
+        - label: 网络流
+        - label: 数论
+        - label: 组合数学
+        - label: 线性代数
+        - label: 计数
+        - label: 字符串
+        - label: 贪心
+        - label: 二分
+        - label: 双指针
+        - label: 分治
+        - label: 扫描线
+        - label: 斜率优化
+        - label: 计算几何
+        - label: 博弈论
+        - label: 构造
+        - label: 交互
+        - label: 提交答案
+  - type: checkboxes
+    id: reason
+    attributes:
+      label: 推荐理由标签（选填，可多选）
+      options:
+        - label: 模型转化
+        - label: 经典套路
+        - label: 反直觉
+        - label: 代码极短
+        - label: 教育意义
+        - label: 观赏性强
+        - label: 卡常技巧
+        - label: 人类智慧
+  - type: textarea
+    id: statement_zh
+    attributes:
+      label: 中文题面（选填，可含 $LaTeX$）
+  - type: input
+    id: statement_zh_url
+    attributes:
+      label: 中文题面来源链接（选填）
+  - type: textarea
+    id: statement_original
+    attributes:
+      label: 原文题面（选填，可含 $LaTeX$）
+  - type: input
+    id: statement_original_lang
+    attributes:
+      label: 原文语言（选填，默认 en）
+  - type: input
+    id: statement_original_url
+    attributes:
+      label: 原文题面来源链接（选填）
+  - type: textarea
+    id: solution
+    attributes:
+      label: 题解（选填，可含 $LaTeX$；作者默认为你）
+  - type: checkboxes
+    id: must_do
+    attributes:
+      label: 必做徽章（选填）
+      options:
+        - label: 为这道题盖“必做”徽章（仅核心/受信任成员有效）

@@ -1,0 +1,42 @@
+# 受控标签白名单
+# 投稿只能从下列标签中选择，不能新建。新增标签需由拥有仓库写权限的核心成员修改本文件。
+# 两个维度：
+#   topic （主题：算法 + 题型，描述“这道题涉及哪些内容”）
+#   reason（主观：为何推荐）
+# 每个标签可带别名 aliases，构建时把别名归一到规范名，避免“DP/dp/动态规划”并存。
+
+topic:
+  - name: DP
+    aliases: [dp, 动态规划, 动规]
+  - name: 数据结构
+  - name: 线段树
+  - name: 树状数组
+  - name: 图论
+  - name: 最短路
+  - name: 网络流
+  - name: 数论
+  - name: 组合数学
+  - name: 线性代数
+  - name: 计数
+  - name: 字符串
+  - name: 贪心
+  - name: 二分
+  - name: 双指针
+  - name: 分治
+  - name: 扫描线
+  - name: 斜率优化
+  - name: 计算几何
+  - name: 博弈论
+  - name: 构造
+  - name: 交互
+  - name: 提交答案
+
+reason:
+  - name: 模型转化
+  - name: 经典套路
+  - name: 反直觉
+  - name: 代码极短
+  - name: 教育意义
+  - name: 观赏性强
+  - name: 卡常技巧
+  - name: 人类智慧

@@ -1,0 +1,178 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://problemset.spec/meta.schema.json",
+  "title": "Problem meta.yml",
+  "description": "DLUT精选题单 · 单题结构化字段规范。跨引用校验（handle/标签白名单/文件存在/配额）由构建管道 M2 额外执行。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "slug", "title", "links", "recommenders"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "主键，等于文件夹名，全局唯一。默认同 slug，冲突时加 -<4位base36> 后缀。",
+      "pattern": "^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$"
+    },
+    "slug": {
+      "type": "string",
+      "description": "人类可读、与题号强相关，通常同 id。",
+      "pattern": "^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$"
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "contest": { "type": "string" },
+        "origin_platform": { "type": "string" }
+      }
+    },
+    "links": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["platform", "url"],
+        "properties": {
+          "platform": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "is_primary": { "type": "boolean" }
+        }
+      }
+    },
+    "recommenders": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["handle"],
+        "properties": {
+          "handle": { "type": "string" },
+          "comment": { "type": "string" },
+          "date": { "type": "string", "format": "date" },
+          "strength": { "type": "integer", "minimum": 1, "maximum": 5 }
+        }
+      }
+    },
+    "tags": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "topic": { "type": "array", "items": { "type": "string" } },
+        "reason": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "difficulty": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evaluator", "scale", "value"],
+        "properties": {
+          "evaluator": { "type": "string" },
+          "scale": { "type": "string", "enum": ["cf", "medal"] },
+          "value": {
+            "oneOf": [
+              { "type": "integer", "minimum": 800, "maximum": 3500 },
+              {
+                "type": "string",
+                "enum": [
+                  "gold_upper", "gold_mid", "gold_lower",
+                  "silver_upper", "silver_mid", "silver_lower",
+                  "bronze_upper", "bronze_mid", "bronze_lower"
+                ]
+              }
+            ]
+          },
+          "date": { "type": "string", "format": "date" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "thinking_ratio": {
+      "type": "array",
+      "description": "题目性质：每人各给一个占比。value 为 0-10 整数，表示 10 份难度里“思维”占几份，实现 = 10 - value。独立于 cf/medal 难度标尺。0=纯实现，10=纯思维。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evaluator", "value"],
+        "properties": {
+          "evaluator": { "type": "string" },
+          "value": { "type": "integer", "minimum": 0, "maximum": 10 },
+          "date": { "type": "string", "format": "date" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "related": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "relation"],
+        "properties": {
+          "id": { "type": "string" },
+          "relation": { "type": "string" }
+        }
+      }
+    },
+    "statements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "kind", "lang"],
+        "properties": {
+          "file": { "type": "string" },
+          "kind": { "type": "string", "enum": ["original", "translation", "simplified"] },
+          "lang": { "type": "string" },
+          "source_url": { "type": "string", "format": "uri" },
+          "license": { "type": "string" },
+          "author": { "type": "string" },
+          "redistribute": { "type": "boolean" }
+        }
+      }
+    },
+    "solutions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "author"],
+        "properties": {
+          "file": { "type": "string" },
+          "author": { "type": "string" },
+          "kind": { "type": "string", "enum": ["editorial", "community"] },
+          "lang": { "type": "string" },
+          "date": { "type": "string", "format": "date" },
+          "source_url": { "type": "string", "format": "uri" },
+          "license": { "type": "string" },
+          "redistribute": { "type": "boolean" }
+        }
+      }
+    },
+    "must_do": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "盖“必做”徽章的 handle 列表；配额由 M2 依据 data/config.yml 校验。"
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "availability": { "type": "string", "enum": ["ok", "limited", "dead"] },
+        "last_checked": { "type": "string", "format": "date" }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "created": { "type": "string", "format": "date" },
+        "updated": { "type": "string", "format": "date" },
+        "added_by": { "type": "string" }
+      }
+    }
+  }
+}
