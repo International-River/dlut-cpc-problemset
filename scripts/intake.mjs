@@ -190,7 +190,21 @@ function ensurePerson(handle) {
   notes.push(`新 handle \`${handle}\` 已自动登记为 guest`);
 }
 
+// 统一用 js-yaml 默认风格（确定性规则：能裸写就裸写，仅会被误解析的值加单引号）。
+// forceQuotes 在本 js-yaml 版本会给数字/布尔加 !!int/!!bool 标签，故不用。
 const dumpYaml = (obj) => yaml.dump(obj, { lineWidth: -1, noRefs: true });
+
+// 题面原文语言：优先下拉里的语言码，其次“其他”输入，默认 zh（本社区多为中文原生题）。
+function origLang() {
+  const dd = str(form.statement_original_lang);
+  if (dd) {
+    const tok = dd.split(/\s+/)[0];
+    if (/^[A-Za-z]{2,}$/.test(tok)) return tok.toLowerCase();
+  }
+  const other = str(form.statement_original_lang_other);
+  if (other) return sanitizeId(other).toLowerCase() || 'zh';
+  return 'zh';
+}
 const writeFileSafe = (abs, content) => {
   fs.mkdirSync(path.dirname(abs), { recursive: true });
   fs.writeFileSync(abs, content, 'utf8');
@@ -253,9 +267,20 @@ function doProblem() {
   const diff = difficultyEntry(handle);
   if (diff) meta.difficulty = [diff];
 
-  // 题面 / 题解文件
+  // 题面 / 题解文件。题面按「原文 / 中文翻译」区分，原文列在前。
   const statements = [];
   const solutions = [];
+  const orig = str(form.statement_original);
+  if (orig) {
+    const lang = origLang();
+    writeFileSafe(path.join(PROBLEMS, id, `statements/original.${lang}.md`), orig + '\n');
+    statements.push({
+      file: `statements/original.${lang}.md`,
+      kind: 'original',
+      lang,
+      ...(str(form.statement_original_url) ? { source_url: str(form.statement_original_url) } : {}),
+    });
+  }
   const zh = str(form.statement_zh);
   if (zh) {
     writeFileSafe(path.join(PROBLEMS, id, 'statements/translation.zh.md'), zh + '\n');
@@ -264,18 +289,6 @@ function doProblem() {
       kind: 'translation',
       lang: 'zh',
       ...(str(form.statement_zh_url) ? { source_url: str(form.statement_zh_url) } : {}),
-    });
-  }
-  const orig = str(form.statement_original);
-  if (orig) {
-    const lang = str(form.statement_original_lang) ?? 'en';
-    const fileLang = sanitizeId(lang).toLowerCase() || 'en';
-    writeFileSafe(path.join(PROBLEMS, id, `statements/original.${fileLang}.md`), orig + '\n');
-    statements.push({
-      file: `statements/original.${fileLang}.md`,
-      kind: 'original',
-      lang: fileLang,
-      ...(str(form.statement_original_url) ? { source_url: str(form.statement_original_url) } : {}),
     });
   }
   if (statements.length) meta.statements = statements;

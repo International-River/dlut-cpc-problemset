@@ -1,70 +1,63 @@
 id: CF2068A
 slug: CF2068A
-title: "Condorcet Elections"
-
+title: Condorcet Elections
 source:
-  contest: "European Championship 2025"
-
+  contest: European Championship 2025
 links:
   - platform: Codeforces
-    url: "https://codeforces.com/contest/2068/problem/A"
+    url: https://codeforces.com/contest/2068/problem/A
     is_primary: true
   - platform: Luogu
-    url: "https://www.luogu.com.cn/problem/CF2068A"
+    url: https://www.luogu.com.cn/problem/CF2068A
   - platform: QOJ
-    url: "https://qoj.ac/contest/1964/problem/10310"
-
+    url: https://qoj.ac/contest/1964/problem/10310
 recommenders:
   - handle: InterRiver
-    comment: "很好的人类智慧构造题，题设有些反直觉，解决方案很优雅。"
-    date: 2026-07-06
+    comment: 很好的人类智慧构造题，题设有些反直觉，解决方案很优雅。
+    date: '2026-07-06'
     strength: 3
-
 tags:
-  topic: [构造]
-  reason: [反直觉, 观赏性强]
-
+  topic:
+    - 构造
+  reason:
+    - 反直觉
+    - 观赏性强
 difficulty:
   - evaluator: InterRiver
     scale: medal
     value: silver_lower
-    date: 2026-07-06
+    date: '2026-07-06'
   - evaluator: Codeforces
     scale: cf
     value: 2300
-
 thinking_ratio:
   - evaluator: InterRiver
     value: 9
-    date: 2026-07-06
-
+    date: '2026-07-06'
 statements:
   - file: statements/original.en.md
     kind: original
     lang: en
-    source_url: "https://codeforces.com/contest/2068/problem/A"
-    license: "仅存档备份"
+    source_url: https://codeforces.com/contest/2068/problem/A
+    license: 仅存档备份
     redistribute: true
   - file: statements/translation.zh.md
     kind: translation
     lang: zh
-    source_url: "https://www.luogu.com.cn/problem/CF2068A"
-    license: "洛谷官方翻译，仅存档备份"
+    source_url: https://www.luogu.com.cn/problem/CF2068A
+    license: 洛谷官方翻译，仅存档备份
     redistribute: true
-
 solutions:
   - file: solutions/InterRiver.md
     author: InterRiver
     kind: community
     lang: zh
-    date: 2026-07-06
+    date: '2026-07-06'
     redistribute: true
-
 status:
   availability: ok
-  last_checked: 2026-07-06
-
+  last_checked: '2026-07-06'
 meta:
-  created: 2026-07-06
-  updated: 2026-07-06
+  created: '2026-07-06'
+  updated: '2026-07-06'
   added_by: InterRiver

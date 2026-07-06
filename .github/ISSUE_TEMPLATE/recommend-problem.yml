@@ -140,26 +140,37 @@ body:
         - label: 观赏性强
         - label: 卡常技巧
         - label: 人类智慧
-  - type: textarea
-    id: statement_zh
+  - type: markdown
     attributes:
-      label: 中文题面（选填，可含 $LaTeX$）
-  - type: input
-    id: statement_zh_url
-    attributes:
-      label: 中文题面来源链接（选填）
+      value: 题面按「原文 / 中文翻译」区分：中文原创题（CSP/NOI/洛谷原创等）中文题面就是**原文**，请填在下面的“题面原文”里。
   - type: textarea
     id: statement_original
     attributes:
-      label: 原文题面（选填，可含 $LaTeX$）
-  - type: input
+      label: 题面原文（选填，可含 $LaTeX$）
+  - type: dropdown
     id: statement_original_lang
     attributes:
-      label: 原文语言（选填，默认 en）
+      label: 题面原文语言（选填，默认按中文处理；CF/AtCoder 等外文题请选 en）
+      options:
+        - zh 中文
+        - en 英文
+        - 其他（在下一栏填写）
+  - type: input
+    id: statement_original_lang_other
+    attributes:
+      label: 题面原文语言·其他（选填，如 ja）
   - type: input
     id: statement_original_url
     attributes:
-      label: 原文题面来源链接（选填）
+      label: 题面原文来源链接（选填）
+  - type: textarea
+    id: statement_zh
+    attributes:
+      label: 中文翻译题面（选填，仅当原文不是中文时才需要）
+  - type: input
+    id: statement_zh_url
+    attributes:
+      label: 中文翻译来源链接（选填）
   - type: textarea
     id: solution
     attributes:

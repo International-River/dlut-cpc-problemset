@@ -80,11 +80,17 @@ const recommendForm = {
     dropdown('thinking_ratio', '思维比例（选填，0=纯实现 … 10=纯思维）', range(0, 10)),
     checkboxes('topic', '主题标签（选填，可多选）', topicNames),
     checkboxes('reason', '推荐理由标签（选填，可多选）', reasonNames),
-    textarea('statement_zh', '中文题面（选填，可含 $LaTeX$）'),
-    input('statement_zh_url', '中文题面来源链接（选填）'),
-    textarea('statement_original', '原文题面（选填，可含 $LaTeX$）'),
-    input('statement_original_lang', '原文语言（选填，默认 en）'),
-    input('statement_original_url', '原文题面来源链接（选填）'),
+    md('题面按「原文 / 中文翻译」区分：中文原创题（CSP/NOI/洛谷原创等）中文题面就是**原文**，请填在下面的“题面原文”里。'),
+    textarea('statement_original', '题面原文（选填，可含 $LaTeX$）'),
+    dropdown('statement_original_lang', '题面原文语言（选填，默认按中文处理；CF/AtCoder 等外文题请选 en）', [
+      'zh 中文',
+      'en 英文',
+      '其他（在下一栏填写）',
+    ]),
+    input('statement_original_lang_other', '题面原文语言·其他（选填，如 ja）'),
+    input('statement_original_url', '题面原文来源链接（选填）'),
+    textarea('statement_zh', '中文翻译题面（选填，仅当原文不是中文时才需要）'),
+    input('statement_zh_url', '中文翻译来源链接（选填）'),
     textarea('solution', '题解（选填，可含 $LaTeX$；作者默认为你）'),
     checkboxes('must_do', '必做徽章（选填）', ['为这道题盖“必做”徽章（仅核心/受信任成员有效）']),
   ],
@@ -133,8 +139,8 @@ const config = {
   contact_links: [
     {
       name: '使用说明 / 讨论',
-      url: 'https://github.com/',
-      about: '不确定填什么？可先在 Discussions 里问。（部署后请把此链接换成真实仓库地址）',
+      url: 'https://github.com/International-River/dlut-cpc-problemset/discussions',
+      about: '不确定填什么？可先在 Discussions 里提问讨论。',
     },
   ],
 };

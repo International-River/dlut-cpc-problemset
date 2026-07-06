@@ -7,6 +7,8 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "check": "node scripts/build.mjs --check",
+    "fmt": "node scripts/fmt.mjs",
+    "fmt:check": "node scripts/fmt.mjs --check",
     "gen:forms": "node scripts/gen-issue-forms.mjs",
     "intake": "node scripts/intake.mjs"
   },
