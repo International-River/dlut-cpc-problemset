@@ -9,6 +9,7 @@ links:
     is_primary: true
 recommenders:
   - handle: InterRiver
+    comment: 很有教育意义的 DP，状态的定义很有意思
     date: '2026-07-06'
     strength: 5
 tags:
@@ -36,3 +37,8 @@ meta:
   created: '2026-07-06'
   updated: '2026-07-06'
   added_by: InterRiver
+difficulty:
+  - evaluator: InterRiver
+    scale: medal
+    value: bronze_upper
+    date: '2026-07-06'
