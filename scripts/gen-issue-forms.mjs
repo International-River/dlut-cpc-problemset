@@ -34,10 +34,17 @@ const input = (id, label, opts = {}) => ({
   attributes: { label, ...(opts.placeholder ? { placeholder: opts.placeholder } : {}) },
   ...(opts.required ? { validations: { required: true } } : {}),
 });
+// render: 让 GitHub 把提交内容包进代码围栏（```），使投稿正文里的 Markdown
+// 标题（如 ### 输入 #1）不会被 github-issue-parser 误判为新表单字段而截断。
+// intake.mjs 会剥掉这层围栏再落盘。注意：render 字段不能同时为 required。
 const textarea = (id, label, opts = {}) => ({
   type: 'textarea',
   id,
-  attributes: { label, ...(opts.placeholder ? { placeholder: opts.placeholder } : {}) },
+  attributes: {
+    label,
+    ...(opts.placeholder ? { placeholder: opts.placeholder } : {}),
+    ...(opts.render ? { render: opts.render } : {}),
+  },
   ...(opts.required ? { validations: { required: true } } : {}),
 });
 const dropdown = (id, label, options, opts = {}) => ({
@@ -81,7 +88,7 @@ const recommendForm = {
     checkboxes('topic', '主题标签（选填，可多选）', topicNames),
     checkboxes('reason', '推荐理由标签（选填，可多选）', reasonNames),
     md('题面按「原文 / 中文翻译」区分：中文原创题（CSP/NOI/洛谷原创等）中文题面就是**原文**，请填在下面的“题面原文”里。'),
-    textarea('statement_original', '题面原文（选填，可含 $LaTeX$）'),
+    textarea('statement_original', '题面原文（选填，可含 $LaTeX$）', { render: 'markdown' }),
     dropdown('statement_original_lang', '题面原文语言（选填，默认按中文处理；CF/AtCoder 等外文题请选 en）', [
       'zh 中文',
       'en 英文',
@@ -89,31 +96,36 @@ const recommendForm = {
     ]),
     input('statement_original_lang_other', '题面原文语言·其他（选填，如 ja）'),
     input('statement_original_url', '题面原文来源链接（选填）'),
-    textarea('statement_zh', '中文翻译题面（选填，仅当原文不是中文时才需要）'),
+    textarea('statement_zh', '中文翻译题面（选填，仅当原文不是中文时才需要）', { render: 'markdown' }),
     input('statement_zh_url', '中文翻译来源链接（选填）'),
-    textarea('solution', '题解（选填，可含 $LaTeX$；作者默认为你）'),
+    textarea('solution', '题解（选填，可含 $LaTeX$；作者默认为你）', { render: 'markdown' }),
     checkboxes('must_do', '必做徽章（选填）', ['为这道题盖“必做”徽章（仅核心/受信任成员有效）']),
   ],
 };
 
 // ---------- 2. 追加评价 / 题解 ----------
 const appendForm = {
-  name: '给已有题追加评价 / 题解',
-  description: '为题单里已有的题追加你的推荐 / 难度评分 / 思维比例 / 题解。填「题目 ID / 你的 handle」即可，其余按需填。',
+  name: '给已有题追加 / 修改评价 / 题解',
+  description: '为题单里已有的题追加或修改你的推荐 / 难度评分 / 思维比例 / 题解。填「题目 ID / 你的 handle」即可，其余按需填。',
   labels: ['intake', 'intake:append'],
   body: [
-    md('为**已有题目**追加内容。只需填题目 ID 与你的 handle，其余按你想追加的部分填即可（留空的不会追加）。'),
+    md(
+      '为**已有题目**追加或修改内容。只需填题目 ID 与你的 handle，其余按需填（留空的不改动）。\n\n' +
+        '**这是“修改自己评价”的入口**：你**再次提交**推荐 / 难度 / 思维 / 题解时，会**覆盖你之前对这道题的同类评价**（不会新增重复条目）；推荐语与强度是合并更新（只改你这次填的那项）。\n' +
+        '注意：你只能改**自己**的评价；改他人评价、订正题面正文或删除条目等，请走 Pull Request 由核心成员处理。',
+    ),
     input('problem_id', '题目 ID（必填，如 CF1458C，即题目文件夹名）', { required: true }),
     input('handle', '你的 handle（必填；新人将自动登记为 guest）', { required: true }),
-    md('—— 以下按需填，留空即不追加 ——'),
-    textarea('comment', '推荐语（选填，填了即追加一条推荐）'),
+    md('—— 以下按需填，留空即不改动；填了即覆盖你之前的同类评价 ——'),
+    textarea('comment', '推荐语（选填，填了即新增/更新你的推荐语）'),
     dropdown('strength', '推荐强度（选填，1 … 5）', range(1, 5)),
     dropdown('difficulty_scale', '难度标尺（选填）', ['cf（Codeforces 分数）', 'medal（奖牌档）']),
     input('cf_value', 'CF 难度分（选填，800–3500）'),
     dropdown('medal_value', '奖牌档（选填）', medalOptions),
     dropdown('thinking_ratio', '思维比例（选填，0 … 10）', range(0, 10)),
-    textarea('solution', '题解（选填，填了即追加一份，作者为你）'),
+    textarea('solution', '题解（选填，填了即新增/覆盖你署名的那份题解）', { render: 'markdown' }),
     checkboxes('must_do', '必做徽章（选填）', ['为这道题盖“必做”徽章（仅核心/受信任成员有效）']),
+    checkboxes('must_do_remove', '撤销必做徽章（选填）', ['撤销我之前为这道题盖的“必做”徽章']),
   ],
 };
 

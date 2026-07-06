@@ -328,7 +328,7 @@ function Detail({ problem: p, data, people }: { problem: Problem; data: Dataset;
             <div className="tr-detail">
               <ThinkBar value={p.derived.thinkingRatioAvg} />
               <span className="muted">
-                思维 {p.derived.thinkingRatioAvg} · 实现 {(10 - p.derived.thinkingRatioAvg).toFixed(1)}
+                思维 {p.derived.thinkingRatioAvg.toFixed(1)} · 实现 {(10 - p.derived.thinkingRatioAvg).toFixed(1)}
               </span>
             </div>
           ) : (

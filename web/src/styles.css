@@ -10,6 +10,8 @@
   --topic: #2b6cb0;
   --reason: #7048a8;
   --must: #d4534f;
+  --think: #4a90ff;
+  --impl: #f0913c;
 }
 
 * { box-sizing: border-box; }
@@ -78,8 +80,9 @@ a:hover { text-decoration: underline; }
 .stars-fg { color: var(--gold); position: absolute; left: 0; top: 0; overflow: hidden; }
 
 .thinkbar { display: inline-flex; width: 90px; height: 8px; border-radius: 4px; overflow: hidden; vertical-align: middle; border: 1px solid var(--border); }
-.thinkbar-think { background: var(--accent); }
-.thinkbar-impl { background: #7fbf7f; }
+/* 思维=蓝、实现=橙，蓝橙互补，对比明显且对色弱友好 */
+.thinkbar-think { background: var(--think); }
+.thinkbar-impl { background: var(--impl); }
 
 /* Detail */
 .detail section { margin: 1.4rem 0; }

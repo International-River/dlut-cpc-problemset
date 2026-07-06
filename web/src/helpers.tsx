@@ -35,7 +35,7 @@ export function ThinkBar({ value }: { value: number | null }) {
   if (value == null) return <span className="muted">—</span>;
   const think = Math.round(value * 10);
   return (
-    <span className="thinkbar" title={`思维 ${value} / 实现 ${10 - value}`}>
+    <span className="thinkbar" title={`思维 ${value.toFixed(1)} / 实现 ${(10 - value).toFixed(1)}`}>
       <span className="thinkbar-think" style={{ width: `${think}%` }} />
       <span className="thinkbar-impl" style={{ width: `${100 - think}%` }} />
     </span>

@@ -147,6 +147,7 @@ body:
     id: statement_original
     attributes:
       label: 题面原文（选填，可含 $LaTeX$）
+      render: markdown
   - type: dropdown
     id: statement_original_lang
     attributes:
@@ -167,6 +168,7 @@ body:
     id: statement_zh
     attributes:
       label: 中文翻译题面（选填，仅当原文不是中文时才需要）
+      render: markdown
   - type: input
     id: statement_zh_url
     attributes:
@@ -175,6 +177,7 @@ body:
     id: solution
     attributes:
       label: 题解（选填，可含 $LaTeX$；作者默认为你）
+      render: markdown
   - type: checkboxes
     id: must_do
     attributes:

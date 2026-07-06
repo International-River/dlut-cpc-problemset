@@ -84,6 +84,19 @@ function checkedList(v) {
     .map((x) => x.trim())
     .filter((x) => x && !EMPTY.has(x));
 }
+// 剥掉 render 文本域外层的代码围栏（```lang … ```）。
+// 表单里题面/题解字段用了 render，GitHub 会把正文包进围栏，github-issue-parser
+// 捕获时连同围栏一起返回；这里去掉首尾同长度的围栏，拿回纯正文。
+// 用捕获组保证首尾反引号数量一致，兼容正文自身含 ``` 时 GitHub 用更长围栏的情形。
+function unfence(v) {
+  if (v == null) return v;
+  const s = String(v).replace(/\r\n/g, '\n').trim();
+  const m = s.match(/^(`{3,})[^\n]*\n([\s\S]*?)\n?\1\s*$/);
+  return m ? m[2] : v;
+}
+// 供 render 文本域使用：先剥围栏再做空值归一。
+const mdField = (v) => str(unfence(v));
+
 const firstToken = (v) => {
   const s = str(v);
   return s ? s.split(/\s+/)[0] : undefined;
@@ -270,7 +283,7 @@ function doProblem() {
   // 题面 / 题解文件。题面按「原文 / 中文翻译」区分，原文列在前。
   const statements = [];
   const solutions = [];
-  const orig = str(form.statement_original);
+  const orig = mdField(form.statement_original);
   if (orig) {
     const lang = origLang();
     writeFileSafe(path.join(PROBLEMS, id, `statements/original.${lang}.md`), orig + '\n');
@@ -281,7 +294,7 @@ function doProblem() {
       ...(str(form.statement_original_url) ? { source_url: str(form.statement_original_url) } : {}),
     });
   }
-  const zh = str(form.statement_zh);
+  const zh = mdField(form.statement_zh);
   if (zh) {
     writeFileSafe(path.join(PROBLEMS, id, 'statements/translation.zh.md'), zh + '\n');
     statements.push({
@@ -293,7 +306,7 @@ function doProblem() {
   }
   if (statements.length) meta.statements = statements;
 
-  const sol = str(form.solution);
+  const sol = mdField(form.solution);
   if (sol) {
     writeFileSafe(path.join(PROBLEMS, id, `solutions/${handle}.md`), sol + '\n');
     solutions.push({ file: `solutions/${handle}.md`, author: handle, kind: 'community', lang: 'zh', date: TODAY });
@@ -329,53 +342,85 @@ function doAppend() {
   const meta = yaml.load(fs.readFileSync(metaPath, 'utf8'));
   ensurePerson(handle);
   const added = [];
+  // 追加/覆盖：同一人对同一题只保留一条推荐/难度/思维/自有题解，
+  // 重复投稿视为“修改本人之前的评价”，按 handle/evaluator/file 覆盖而非新增重复条目。
+  const mark = (label, action) => added.push(action === 'updated' ? `${label}（更新）` : label);
+  const upsert = (arr, matchFn, entry) => {
+    const i = arr.findIndex(matchFn);
+    if (i >= 0) {
+      arr[i] = entry;
+      return 'updated';
+    }
+    arr.push(entry);
+    return 'added';
+  };
 
   if (str(form.comment) || intOf(form.strength) != null) {
+    meta.recommenders ??= [];
+    // 合并式更新：只覆盖本次填了的字段（推荐语 / 强度），保留未填的旧值。
+    const prev = meta.recommenders.find((r) => r?.handle === handle);
     const rec = { handle };
-    if (str(form.comment)) rec.comment = str(form.comment);
+    const comment = str(form.comment) ?? prev?.comment;
+    if (comment) rec.comment = comment;
     rec.date = TODAY;
-    if (intOf(form.strength) != null) rec.strength = intOf(form.strength);
-    (meta.recommenders ??= []).push(rec);
-    added.push('推荐');
+    const strength = intOf(form.strength) ?? prev?.strength;
+    if (strength != null) rec.strength = strength;
+    mark('推荐', upsert(meta.recommenders, (r) => r?.handle === handle, rec));
   }
 
   const diff = difficultyEntry(handle);
   if (diff) {
-    (meta.difficulty ??= []).push(diff);
-    added.push('难度');
+    meta.difficulty ??= [];
+    mark('难度', upsert(meta.difficulty, (d) => d?.evaluator === handle, diff));
   }
 
   if (intOf(form.thinking_ratio) != null) {
-    (meta.thinking_ratio ??= []).push({ evaluator: handle, value: intOf(form.thinking_ratio), date: TODAY });
-    added.push('思维比例');
+    meta.thinking_ratio ??= [];
+    const entry = { evaluator: handle, value: intOf(form.thinking_ratio), date: TODAY };
+    mark('思维比例', upsert(meta.thinking_ratio, (t) => t?.evaluator === handle, entry));
   }
 
-  const sol = str(form.solution);
+  const sol = mdField(form.solution);
   if (sol) {
-    writeFileSafe(path.join(dir, `solutions/${handle}.md`), sol + '\n');
-    (meta.solutions ??= []).push({ file: `solutions/${handle}.md`, author: handle, kind: 'community', lang: 'zh', date: TODAY });
-    added.push('题解');
+    const file = `solutions/${handle}.md`;
+    writeFileSafe(path.join(dir, file), sol + '\n');
+    meta.solutions ??= [];
+    const entry = { file, author: handle, kind: 'community', lang: 'zh', date: TODAY };
+    mark('题解', upsert(meta.solutions, (s) => s?.file === file, entry));
   }
 
-  if (checkedList(form.must_do).length > 0) {
+  // 撤销本人必做徽章（优先于盖章处理，避免同一表单又盖又撤的歧义）。
+  if (checkedList(form.must_do_remove).length > 0) {
+    if (Array.isArray(meta.must_do) && meta.must_do.includes(handle)) {
+      meta.must_do = meta.must_do.filter((h) => h !== handle);
+      if (meta.must_do.length === 0) delete meta.must_do;
+      added.push('撤销必做徽章');
+    } else {
+      notes.push(`handle \`${handle}\` 本就没有必做徽章，撤销无效果`);
+    }
+  } else if (checkedList(form.must_do).length > 0) {
     const role = roleOf(handle);
     if (role && canGrantMustDo.includes(role)) {
-      (meta.must_do ??= []);
-      if (!meta.must_do.includes(handle)) meta.must_do.push(handle);
-      added.push('必做徽章');
+      meta.must_do ??= [];
+      if (!meta.must_do.includes(handle)) {
+        meta.must_do.push(handle);
+        added.push('必做徽章');
+      } else {
+        notes.push(`handle \`${handle}\` 已有必做徽章，无需重复盖章`);
+      }
     } else {
       notes.push(`handle \`${handle}\`（role=${role ?? 'guest'}）无权盖必做徽章，已忽略`);
     }
   }
 
-  if (added.length === 0) die('没有任何可追加的内容（推荐/难度/思维/题解/必做都为空）');
+  if (added.length === 0) die('没有任何可追加/修改的内容（推荐/难度/思维/题解/必做都为空）');
 
   meta.meta ??= {};
   meta.meta.updated = TODAY;
   writeFileSafe(metaPath, dumpYaml(meta));
   outBranch = `intake/append-${pid}`;
-  outTitle = `追加：${pid}（${added.join('、')}） by ${handle}`;
-  console.log(`✓ 已向 ${pid} 追加：${added.join('、')}`);
+  outTitle = `追加/修改：${pid}（${added.join('、')}） by ${handle}`;
+  console.log(`✓ 已向 ${pid} 追加/修改：${added.join('、')}`);
 }
 
 // ============================================================

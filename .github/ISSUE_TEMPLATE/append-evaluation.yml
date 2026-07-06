@@ -1,13 +1,17 @@
 # 本文件由 scripts/gen-issue-forms.mjs 依据白名单快照自动生成，请勿手改。
-name: 给已有题追加评价 / 题解
-description: 为题单里已有的题追加你的推荐 / 难度评分 / 思维比例 / 题解。填「题目 ID / 你的 handle」即可，其余按需填。
+name: 给已有题追加 / 修改评价 / 题解
+description: 为题单里已有的题追加或修改你的推荐 / 难度评分 / 思维比例 / 题解。填「题目 ID / 你的 handle」即可，其余按需填。
 labels:
   - intake
   - intake:append
 body:
   - type: markdown
     attributes:
-      value: 为**已有题目**追加内容。只需填题目 ID 与你的 handle，其余按你想追加的部分填即可（留空的不会追加）。
+      value: |-
+        为**已有题目**追加或修改内容。只需填题目 ID 与你的 handle，其余按需填（留空的不改动）。
+
+        **这是“修改自己评价”的入口**：你**再次提交**推荐 / 难度 / 思维 / 题解时，会**覆盖你之前对这道题的同类评价**（不会新增重复条目）；推荐语与强度是合并更新（只改你这次填的那项）。
+        注意：你只能改**自己**的评价；改他人评价、订正题面正文或删除条目等，请走 Pull Request 由核心成员处理。
   - type: input
     id: problem_id
     attributes:
@@ -22,11 +26,11 @@ body:
       required: true
   - type: markdown
     attributes:
-      value: —— 以下按需填，留空即不追加 ——
+      value: —— 以下按需填，留空即不改动；填了即覆盖你之前的同类评价 ——
   - type: textarea
     id: comment
     attributes:
-      label: 推荐语（选填，填了即追加一条推荐）
+      label: 推荐语（选填，填了即新增/更新你的推荐语）
   - type: dropdown
     id: strength
     attributes:
@@ -81,10 +85,17 @@ body:
   - type: textarea
     id: solution
     attributes:
-      label: 题解（选填，填了即追加一份，作者为你）
+      label: 题解（选填，填了即新增/覆盖你署名的那份题解）
+      render: markdown
   - type: checkboxes
     id: must_do
     attributes:
       label: 必做徽章（选填）
       options:
         - label: 为这道题盖“必做”徽章（仅核心/受信任成员有效）
+  - type: checkboxes
+    id: must_do_remove
+    attributes:
+      label: 撤销必做徽章（选填）
+      options:
+        - label: 撤销我之前为这道题盖的“必做”徽章
