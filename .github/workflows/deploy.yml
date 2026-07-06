@@ -26,9 +26,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      # 用 node24 运行时的 Action 版本（消除 Node20 弃用告警）；
+      # node-version 仍锁 20，那是跑我们脚本的构建运行时，与 Action 自身运行时无关。
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
@@ -50,9 +52,9 @@ jobs:
           npm ci
           npm run build
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: web/dist
 
@@ -64,4 +66,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

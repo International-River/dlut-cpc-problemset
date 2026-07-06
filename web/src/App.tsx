@@ -20,7 +20,9 @@ export default function App() {
   const route = useHashRoute();
 
   useEffect(() => {
-    fetch(import.meta.env.BASE_URL + 'data.json')
+    // 加 ?v=<构建版本> 击穿浏览器与 GitHub Pages CDN 缓存：data.json 文件名固定、
+    // 不带内容哈希，新部署后旧数据会被缓存一段时间；版本号随每次构建变化即可强制取新。
+    fetch(`${import.meta.env.BASE_URL}data.json?v=${__BUILD_ID__}`)
       .then((r) => {
         if (!r.ok) throw new Error(`加载 data.json 失败：HTTP ${r.status}`);
         return r.json();
