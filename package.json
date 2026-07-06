@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "DLUT精选题单 —— 数据仓库与构建管道",
+  "description": "DLUT CPC 精选题单 —— 数据仓库与构建管道",
   "scripts": {
     "build": "node scripts/build.mjs",
     "check": "node scripts/build.mjs --check",

@@ -86,7 +86,7 @@ function List({ data, people }: { data: Dataset; people: ReturnType<typeof build
   return (
     <div className="wrap">
       <header className="site-header">
-        <h1>DLUT精选题单</h1>
+        <h1>DLUT CPC 精选题单</h1>
         <p className="sub">
           共 {data.counts.problems} 题 · {data.counts.people} 人 ·
           <span className="muted"> 数据生成于 {new Date(data.generatedAt).toLocaleString()}</span>

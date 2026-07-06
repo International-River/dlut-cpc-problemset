@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://problemset.spec/meta.schema.json",
   "title": "Problem meta.yml",
-  "description": "DLUT精选题单 · 单题结构化字段规范。跨引用校验（handle/标签白名单/文件存在/配额）由构建管道 M2 额外执行。",
+  "description": "DLUT CPC 精选题单 · 单题结构化字段规范。跨引用校验（handle/标签白名单/文件存在/配额）由构建管道 M2 额外执行。",
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "slug", "title", "links", "recommenders"],
