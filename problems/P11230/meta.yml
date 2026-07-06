@@ -23,8 +23,8 @@ thinking_ratio:
     value: 6
     date: '2026-07-06'
 statements:
-  - file: statements/translation.zh.md
-    kind: translation
+  - file: statements/original.zh.md
+    kind: original
     lang: zh
     source_url: https://www.luogu.com.cn/problem/P11230
 must_do:
