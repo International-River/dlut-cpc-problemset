@@ -1,0 +1,38 @@
+id: P11230
+slug: P11230
+title: '[CSP-J 2024] 接龙'
+source:
+  contest: CSP-J 2024
+links:
+  - platform: Luogu
+    url: https://www.luogu.com.cn/problem/P11230
+    is_primary: true
+recommenders:
+  - handle: InterRiver
+    date: '2026-07-06'
+    strength: 5
+tags:
+  topic:
+    - DP
+    - 双指针
+  reason:
+    - 经典套路
+    - 教育意义
+thinking_ratio:
+  - evaluator: InterRiver
+    value: 6
+    date: '2026-07-06'
+statements:
+  - file: statements/translation.zh.md
+    kind: translation
+    lang: zh
+    source_url: https://www.luogu.com.cn/problem/P11230
+must_do:
+  - InterRiver
+status:
+  availability: ok
+  last_checked: '2026-07-06'
+meta:
+  created: '2026-07-06'
+  updated: '2026-07-06'
+  added_by: InterRiver
