@@ -1,0 +1,67 @@
+# M8 · 构建并部署到 GitHub Pages
+# push 到 main（或手动触发）时：先跑 M2 构建生成 dist/data.json，
+# 再构建 M3 前端（其 prebuild 会把 data.json 复制进来），最后用官方
+# Pages 动作把 web/dist/ 发布到 GitHub Pages。
+#
+# ⚠️ 一次性设置：仓库 Settings → Pages → Source 选 "GitHub Actions"。
+name: 部署 Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Pages 部署所需的最小权限集
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一时刻只保留一个部署；不取消进行中的发布，避免半成品上线
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          # 根目录与前端各有自己的 lockfile，都纳入 npm 缓存键
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+
+      # ① 根目录：校验数据并生成 dist/data.json（顺序不能错，前端依赖它）
+      - name: 构建数据（M2）
+        run: |
+          npm ci
+          npm run build
+
+      # ② 前端：其 prebuild 会把上一步的 dist/data.json 复制进 web/public/
+      - name: 构建前端（M3）
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -285,7 +285,24 @@ solutions:
 
 ---
 
+## 10.5 部署（M8：CI/CD → GitHub Pages）
+
+**目标**：把「数据 → 校验 → 构建 → 前端静态站」编排成全自动流水线，push 到 `main` 即上线。
+
+- **`deploy.yml`**（`push` 到 `main` / `workflow_dispatch` 触发）按**固定顺序**构建后用官方 Pages 动作发布：
+  1. 根目录 `npm ci && npm run build` → 生成 `dist/data.json`（M2）；
+  2. `cd web && npm ci && npm run build` → 前端 `prebuild` 复制上一步的 `data.json`，产出 `web/dist/`（M3）；
+  3. `actions/configure-pages` + `actions/upload-pages-artifact`（上传 `web/dist/`）+ `actions/deploy-pages` 发布。
+- `dist/data.json` 与 `web/public/data.json` 均已 gitignore，仓库无此文件，故 CI 必须自行按上序生成；**顺序不可颠倒**。
+- 权限收敛为 `pages: write` + `id-token: write` + `contents: read`；`concurrency` 组 `pages`（不取消进行中发布）。两处 `npm ci` 开启 npm 缓存；Node 版本与其余工作流一致（20）。
+- 站点为 **project pages**（`https://international-river.github.io/dlut-cpc-problemset/`）：前端 `base: './'` + hash 路由，资源与 `data.json` 以相对路径加载，可在子路径下正确取到。
+- **一次性人工设置**：仓库 **Settings → Pages → Source 选 “GitHub Actions”**。
+- **月度死链检查**（§8.8 软校验）属 M7，需配套链接探活脚本，尚未实现；将来以 `schedule` 触发、**不阻断部署**的独立软校验工作流补齐。
+
+---
+
 ## 11. 变更记录
 
+- v0.3（M8）：新增 `deploy.yml`，push 到 `main` 自动构建（M2 → M3 顺序）并部署到 GitHub Pages。
 - v0.2（M4）：新增 Issue 投稿 → PR 流程（三种表单 + 白名单快照生成 + intake 解析 + 两条工作流）。
 - v0.1（初版）：确定目录结构、字段 schema、ID 规则、标签/人员/难度/版权/推荐度策略。
